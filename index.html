@@ -127,7 +127,7 @@
     <div id="controls-legend">
         <strong>CONTROLS</strong>
         WASD / L-Stick — Move<br>
-        Mouse / R-Stick X — Look around<br>
+        Mouse / Headset — Look around<br>
         Click planet / VR Trigger — Land on it<br>
         Q / E / R-Stick Y — Float up / down
     </div>
@@ -136,8 +136,7 @@
         WASD / L-Stick — Walk on planet<br>
         SPACE / VR A/X — Jump<br>
         Click rock / VR Trigger — Pick up / throw<br>
-        🚀 Panel / VR B/Y — Return to space<br>
-        VR R-Stick X — Turn
+        🚀 Panel / VR B/Y — Return to space
     </div>
 
     <!-- ══ TRAVEL / LAUNCH OVERLAYS ══════════════════════════════ -->
@@ -335,8 +334,7 @@
         <!-- ══ CAMERA RIG ════════════════════════════════════════════
        planet-controller handles ALL movement once flying begins.
        movement-controls handles free space flight.             -->
-        <a-entity id="rig" position="0 20 60"
-            movement-controls="controls: keyboard,touch; fly: true; speed: 0.15; constrainToNavMesh: false"
+        <a-entity id="rig" position="0 20 60" movement-controls="fly: true; speed: 0.15; constrainToNavMesh: false"
             planet-controller>
             <a-entity id="cam" camera="fov: 80; near: 0.1; far: 8000"
                 look-controls="pointerLockEnabled: true; reverseMouseDrag: false" position="0 1.6 0">
@@ -346,12 +344,10 @@
             </a-entity>
 
             <!-- ══ VR CONTROLLERS ════════════════════════════════════════ -->
-            <a-entity id="leftHand" oculus-touch-controls="hand: left" cursor="rayOrigin: entity"
-                raycaster="objects: .clickable; showLine: true; far: 600" vr-controller="hand: left"
-                line="color: #44aaff; opacity: 0.8"></a-entity>
-            <a-entity id="rightHand" oculus-touch-controls="hand: right" cursor="rayOrigin: entity"
-                raycaster="objects: .clickable; showLine: true; far: 600" vr-controller="hand: right"
-                line="color: #44aaff; opacity: 0.8"></a-entity>
+            <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable; far: 600"
+                vr-controller="hand: left" line="color: #44aaff; opacity: 0.5"></a-entity>
+            <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable; far: 600"
+                vr-controller="hand: right" line="color: #44aaff; opacity: 0.5"></a-entity>
         </a-entity>
 
     </a-scene>
@@ -391,10 +387,9 @@
                 if (keys['KeyQ']) rig.object3D.position.y -= 8 * dt;
                 if (keys['KeyE']) rig.object3D.position.y += 8 * dt;
 
-                // Quest Right Stick
-                if (window.vrRightStick) {
-                    if (Math.abs(window.vrRightStick.y) > 0.1) rig.object3D.position.y -= window.vrRightStick.y * 12 * dt;
-                    if (Math.abs(window.vrRightStick.x) > 0.1) rig.object3D.rotation.y -= window.vrRightStick.x * 2.5 * dt;
+                // Quest Right Stick up/down
+                if (window.vrRightStick && Math.abs(window.vrRightStick.y) > 0.1) {
+                    rig.object3D.position.y -= window.vrRightStick.y * 12 * dt;
                 }
 
                 // Quest Left Stick Space Flight
