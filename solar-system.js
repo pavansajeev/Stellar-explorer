@@ -243,6 +243,46 @@ AFRAME.registerComponent('travel-to', {
 });
 
 // ══════════════════════════════════════════════════════════════
+//  VR CONTROLLER — thumbstick and buttons
+// ══════════════════════════════════════════════════════════════
+window.vrLeftStick = { x: 0, y: 0 };
+window.vrRightStick = { x: 0, y: 0 };
+
+AFRAME.registerComponent('vr-controller', {
+    schema: { hand: { type: 'string', default: '' } },
+    init() {
+        this.el.addEventListener('thumbstickmoved', e => {
+            if (this.data.hand === 'left') {
+                window.vrLeftStick.x = e.detail.x;
+                window.vrLeftStick.y = e.detail.y;
+            } else {
+                window.vrRightStick.x = e.detail.x;
+                window.vrRightStick.y = e.detail.y;
+            }
+        });
+
+        const jump = () => {
+            if (gameState === GS.SURFACE) {
+                const jStr = currentPlanet ? currentPlanet.jumpStrength : 4;
+                jumpVel = Math.max(jumpVel, jStr);
+            }
+        };
+        this.el.addEventListener('abuttondown', jump);
+        this.el.addEventListener('xbuttondown', jump);
+
+        const launch = () => {
+            if (gameState === GS.SURFACE || gameState === GS.DESCENDING) {
+                window.launchToSpace();
+            } else if (gameState === GS.SPACE) {
+                window.returnToOverview();
+            }
+        };
+        this.el.addEventListener('bbuttondown', launch);
+        this.el.addEventListener('ybuttondown', launch);
+    }
+});
+
+// ══════════════════════════════════════════════════════════════
 //  PLANET CONTROLLER — one component handles all phases
 //  Replaces: gravity-controller + surface-walker (two old components)
 // ══════════════════════════════════════════════════════════════
@@ -334,11 +374,21 @@ AFRAME.registerComponent('planet-controller', {
             const right = new THREE.Vector3().crossVectors(forward, normal).normalize();
 
             let mx = 0, mz = 0;
-            if (this.keys['KeyW'] || this.keys['ArrowUp']) mz = -1;
-            if (this.keys['KeyS'] || this.keys['ArrowDown']) mz = 1;
-            if (this.keys['KeyA'] || this.keys['ArrowLeft']) mx = -1;
-            if (this.keys['KeyD'] || this.keys['ArrowRight']) mx = 1;
+            if (this.keys['KeyW'] || this.keys['ArrowUp']) mz -= 1;
+            if (this.keys['KeyS'] || this.keys['ArrowDown']) mz += 1;
+            if (this.keys['KeyA'] || this.keys['ArrowLeft']) mx -= 1;
+            if (this.keys['KeyD'] || this.keys['ArrowRight']) mx += 1;
+
+            if (window.vrLeftStick) {
+                if (Math.abs(window.vrLeftStick.x) > 0.1) mx += window.vrLeftStick.x;
+                if (Math.abs(window.vrLeftStick.y) > 0.1) mz += window.vrLeftStick.y;
+            }
+
             if (mx !== 0 || mz !== 0) {
+                // Normalize magnitude so diagonals/thumbsticks aren't artificially faster
+                const len = Math.sqrt(mx * mx + mz * mz);
+                if (len > 1) { mx /= len; mz /= len; }
+
                 rig.position.add(forward.clone().multiplyScalar(-mz * speed)
                     .add(right.clone().multiplyScalar(mx * speed)));
                 // Re-lock height after lateral move

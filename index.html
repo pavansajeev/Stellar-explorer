@@ -126,17 +126,17 @@
     <!-- ══ CONTROLS LEGENDS ═══════════════════════════════════════ -->
     <div id="controls-legend">
         <strong>CONTROLS</strong>
-        WASD / Arrows — Move<br>
-        Mouse — Look around<br>
-        Click planet — Land on it<br>
-        Q / E — Float up / down
+        WASD / L-Stick — Move<br>
+        Mouse / Headset — Look around<br>
+        Click planet / VR Trigger — Land on it<br>
+        Q / E / R-Stick Y — Float up / down
     </div>
     <div id="surface-controls-legend" style="display:none">
         <strong>ON THE SURFACE</strong>
-        WASD — Walk on planet<br>
-        SPACE — Jump<br>
-        Click rock — Pick up / throw<br>
-        🚀 Panel — Return to space
+        WASD / L-Stick — Walk on planet<br>
+        SPACE / VR A/X — Jump<br>
+        Click rock / VR Trigger — Pick up / throw<br>
+        🚀 Panel / VR B/Y — Return to space
     </div>
 
     <!-- ══ TRAVEL / LAUNCH OVERLAYS ══════════════════════════════ -->
@@ -342,6 +342,12 @@
                     raycaster="objects: .clickable; far: 600; interval: 50">
                 </a-entity>
             </a-entity>
+
+            <!-- ══ VR CONTROLLERS ════════════════════════════════════════ -->
+            <a-entity id="leftHand" laser-controls="hand: left" raycaster="objects: .clickable; far: 600"
+                vr-controller="hand: left" line="color: #44aaff; opacity: 0.5"></a-entity>
+            <a-entity id="rightHand" laser-controls="hand: right" raycaster="objects: .clickable; far: 600"
+                vr-controller="hand: right" line="color: #44aaff; opacity: 0.5"></a-entity>
         </a-entity>
 
     </a-scene>
@@ -368,17 +374,36 @@
             if (!document.getElementById('scene').is('vr-mode')) document.body.requestPointerLock?.();
         });
 
-        // ── Q/E FLOAT (space mode only) ─────────────────────────────
+        // ── Q/E + VR FLOAT (space mode only) ────────────────────────
         const keys = {};
         document.addEventListener('keydown', e => keys[e.code] = true);
         document.addEventListener('keyup', e => keys[e.code] = false);
         const rig = document.getElementById('rig');
-        let lt = 0;
+        let lt = performance.now();
         function floatLoop(t) {
-            const dt = (t - lt) / 1000; lt = t;
+            const dt = Math.min((t - lt) / 1000, 0.1); lt = t;
             if (gameState === 'space') {
+                // Keyboard up/down
                 if (keys['KeyQ']) rig.object3D.position.y -= 8 * dt;
                 if (keys['KeyE']) rig.object3D.position.y += 8 * dt;
+
+                // Quest Right Stick up/down
+                if (window.vrRightStick && Math.abs(window.vrRightStick.y) > 0.1) {
+                    rig.object3D.position.y -= window.vrRightStick.y * 12 * dt;
+                }
+
+                // Quest Left Stick Space Flight
+                if (window.vrLeftStick && (Math.abs(window.vrLeftStick.x) > 0.1 || Math.abs(window.vrLeftStick.y) > 0.1)) {
+                    let mx = window.vrLeftStick.x;
+                    let mz = window.vrLeftStick.y;
+                    const speed = 40 * dt;
+                    const camDir = new THREE.Vector3();
+                    document.getElementById('cam').object3D.getWorldDirection(camDir);
+                    const right = new THREE.Vector3().crossVectors(camDir, new THREE.Vector3(0, 1, 0)).normalize();
+                    const forward = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), right).normalize();
+                    rig.object3D.position.add(forward.clone().multiplyScalar(-mz * speed));
+                    rig.object3D.position.add(right.clone().multiplyScalar(mx * speed));
+                }
             }
             requestAnimationFrame(floatLoop);
         }
