@@ -409,24 +409,6 @@
                     rig.object3D.position.add(forward.clone().multiplyScalar(-mz * speed));
                     rig.object3D.position.add(right.clone().multiplyScalar(mx * speed));
                 }
-
-                // Quest Right Stick up/down
-                if (window.vrRightStick && Math.abs(window.vrRightStick.y) > 0.1) {
-                    rig.object3D.position.y -= window.vrRightStick.y * 12 * dt;
-                }
-
-                // Quest Left Stick Space Flight
-                if (window.vrLeftStick && (Math.abs(window.vrLeftStick.x) > 0.1 || Math.abs(window.vrLeftStick.y) > 0.1)) {
-                    let mx = window.vrLeftStick.x;
-                    let mz = window.vrLeftStick.y;
-                    const speed = 40 * dt;
-                    const camDir = new THREE.Vector3();
-                    document.getElementById('cam').object3D.getWorldDirection(camDir);
-                    const right = new THREE.Vector3().crossVectors(camDir, new THREE.Vector3(0, 1, 0)).normalize();
-                    const forward = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), right).normalize();
-                    rig.object3D.position.add(forward.clone().multiplyScalar(-mz * speed));
-                    rig.object3D.position.add(right.clone().multiplyScalar(mx * speed));
-                }
             }
             requestAnimationFrame(floatLoop);
         }
