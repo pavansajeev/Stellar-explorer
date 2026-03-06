@@ -11,6 +11,7 @@ let gameState = GS.SPACE;
 
 // Current planet context
 let currentPlanet = null;   // planet data object
+let currentPlanetId = null; // planet DOM id
 let planetCenter = new THREE.Vector3();
 let planetRadius = 1;
 
@@ -243,46 +244,6 @@ AFRAME.registerComponent('travel-to', {
 });
 
 // ══════════════════════════════════════════════════════════════
-//  VR CONTROLLER — thumbstick and buttons
-// ══════════════════════════════════════════════════════════════
-window.vrLeftStick = { x: 0, y: 0 };
-window.vrRightStick = { x: 0, y: 0 };
-
-AFRAME.registerComponent('vr-controller', {
-    schema: { hand: { type: 'string', default: '' } },
-    init() {
-        this.el.addEventListener('thumbstickmoved', e => {
-            if (this.data.hand === 'left') {
-                window.vrLeftStick.x = e.detail.x;
-                window.vrLeftStick.y = e.detail.y;
-            } else {
-                window.vrRightStick.x = e.detail.x;
-                window.vrRightStick.y = e.detail.y;
-            }
-        });
-
-        const jump = () => {
-            if (gameState === GS.SURFACE) {
-                const jStr = currentPlanet ? currentPlanet.jumpStrength : 4;
-                jumpVel = Math.max(jumpVel, jStr);
-            }
-        };
-        this.el.addEventListener('abuttondown', jump);
-        this.el.addEventListener('xbuttondown', jump);
-
-        const launch = () => {
-            if (gameState === GS.SURFACE || gameState === GS.DESCENDING) {
-                window.launchToSpace();
-            } else if (gameState === GS.SPACE) {
-                window.returnToOverview();
-            }
-        };
-        this.el.addEventListener('bbuttondown', launch);
-        this.el.addEventListener('ybuttondown', launch);
-    }
-});
-
-// ══════════════════════════════════════════════════════════════
 //  PLANET CONTROLLER — one component handles all phases
 //  Replaces: gravity-controller + surface-walker (two old components)
 // ══════════════════════════════════════════════════════════════
@@ -310,6 +271,11 @@ AFRAME.registerComponent('planet-controller', {
     tick(t, dt) {
         if (!this.cam) this.cam = document.getElementById('cam');
         const rig = this.el.object3D;
+
+        if ((gameState === GS.DESCENDING || gameState === GS.SURFACE) && currentPlanetId) {
+            const pEl = document.getElementById(currentPlanetId);
+            if (pEl) pEl.object3D.getWorldPosition(planetCenter);
+        }
 
         // ── DESCENDING PHASE ───────────────────────────────────────
         if (gameState === GS.DESCENDING) {
@@ -342,7 +308,7 @@ AFRAME.registerComponent('planet-controller', {
 
             // Apply jump / gravity physics along normal
             const g = (currentPlanet ? currentPlanet.gravity : 9.81) * 0.04;
-            jumpVel -= g * dt; // gravity pulls down (reduces jump velocity)
+            jumpVel -= g * (dt / 16.666); // gravity pulls down (normalized for 60fps)
 
             // Clamp falling speed
             if (jumpVel < -12) jumpVel = -12;
@@ -354,14 +320,13 @@ AFRAME.registerComponent('planet-controller', {
             // Re-read position after physics
             rig.getWorldPosition(playerPos);
             const eyeHeight = 1.7;
-            const dist = playerPos.distanceTo(planetCenter);
+            const distCenter = playerPos.clone().sub(planetCenter).dot(normal);
             const surfaceDist = planetRadius + eyeHeight;
 
             // Ground clamping
-            if (dist <= surfaceDist) {
+            if (distCenter <= surfaceDist) {
                 jumpVel = Math.max(jumpVel, 0);
-                const groundPos = planetCenter.clone().add(
-                    playerPos.clone().sub(planetCenter).normalize().multiplyScalar(surfaceDist));
+                const groundPos = planetCenter.clone().add(normal.clone().multiplyScalar(surfaceDist));
                 rig.position.copy(groundPos);
             }
 
@@ -374,21 +339,11 @@ AFRAME.registerComponent('planet-controller', {
             const right = new THREE.Vector3().crossVectors(forward, normal).normalize();
 
             let mx = 0, mz = 0;
-            if (this.keys['KeyW'] || this.keys['ArrowUp']) mz -= 1;
-            if (this.keys['KeyS'] || this.keys['ArrowDown']) mz += 1;
-            if (this.keys['KeyA'] || this.keys['ArrowLeft']) mx -= 1;
-            if (this.keys['KeyD'] || this.keys['ArrowRight']) mx += 1;
-
-            if (window.vrLeftStick) {
-                if (Math.abs(window.vrLeftStick.x) > 0.1) mx += window.vrLeftStick.x;
-                if (Math.abs(window.vrLeftStick.y) > 0.1) mz += window.vrLeftStick.y;
-            }
-
+            if (this.keys['KeyW'] || this.keys['ArrowUp']) mz = -1;
+            if (this.keys['KeyS'] || this.keys['ArrowDown']) mz = 1;
+            if (this.keys['KeyA'] || this.keys['ArrowLeft']) mx = -1;
+            if (this.keys['KeyD'] || this.keys['ArrowRight']) mx = 1;
             if (mx !== 0 || mz !== 0) {
-                // Normalize magnitude so diagonals/thumbsticks aren't artificially faster
-                const len = Math.sqrt(mx * mx + mz * mz);
-                if (len > 1) { mx /= len; mz /= len; }
-
                 rig.position.add(forward.clone().multiplyScalar(-mz * speed)
                     .add(right.clone().multiplyScalar(mx * speed)));
                 // Re-lock height after lateral move
@@ -489,6 +444,7 @@ function resetAtmosphere() { setAtmosphere('#000010', .0012); }
 // ══════════════════════════════════════════════════════════════
 function _startFlight(id, pd, target, radius) {
     gameState = GS.FLYING;
+    currentPlanetId = id;
     currentPlanet = pd; planetCenter.copy(target); planetRadius = radius;
     jumpVel = 0; descentVel = 0;
 
@@ -555,6 +511,7 @@ window.launchToSpace = function () {
         _hideOverlay('launch-overlay');
         gameState = GS.SPACE;
         currentPlanet = null;
+        currentPlanetId = null;
         jumpVel = 0; descentVel = 0;
 
         // Re-enable free flight
