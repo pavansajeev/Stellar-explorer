@@ -8,18 +8,13 @@
     <meta name="description"
         content="Immersive A-Frame solar system: travel to planets, feel gravity, pick up objects." />
     <link rel="stylesheet" href="style.css" />
-
-    <!-- A-Frame -->
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <!-- Extra cursor / raycaster controls -->
     <script src="https://unpkg.com/aframe-extras@7.4.0/dist/aframe-extras.min.js"></script>
 </head>
 
 <body>
 
-    <!-- ══════════════════════════════════════════════════════════
-     LOADING SCREEN
-══════════════════════════════════════════════════════════ -->
+    <!-- ══ LOADING SCREEN ════════════════════════════════════════ -->
     <div id="loading-screen">
         <h1>☀ SOLAR SYSTEM</h1>
         <p>INITIALIZING STELLAR MAP…</p>
@@ -28,24 +23,23 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-     CROSSHAIR
-══════════════════════════════════════════════════════════ -->
+    <!-- ══ LANDING FLASH ═════════════════════════════════════════ -->
+    <div id="landing-flash"></div>
+
+    <!-- ══ CROSSHAIR ═════════════════════════════════════════════ -->
     <div id="crosshair"></div>
 
-    <!-- ══════════════════════════════════════════════════════════
-     TRAVEL HINT
-══════════════════════════════════════════════════════════ -->
+    <!-- ══ TRAVEL HINT ═══════════════════════════════════════════ -->
     <div id="travel-hint"></div>
 
-    <!-- ══════════════════════════════════════════════════════════
-     HUD PLANET PANEL
-══════════════════════════════════════════════════════════ -->
+    <!-- ══ BASIC HUD (sun info / space view) ════════════════════ -->
     <div id="hud-panel">
         <div class="hud-card">
             <div id="hud-planet">Planet</div>
-            <div id="hud-gravity">Gravity: — m/s²</div>
-            <div id="hud-fact"></div>
+            <div id="hud-gravity" style="font-size:14px;color:#7de8ff;margin-top:2px;">Gravity: — m/s²</div>
+            <div id="hud-fact"
+                style="font-size:13px;color:rgba(200,230,255,0.8);margin-top:8px;border-top:1px solid rgba(80,200,255,0.15);padding-top:8px;">
+            </div>
         </div>
         <div class="hud-card hud-actions">
             <button class="hud-btn" onclick="returnToOverview()">⬅ OVERVIEW</button>
@@ -53,9 +47,102 @@
         </div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-     TRAVEL OVERLAY (warp animation)
-══════════════════════════════════════════════════════════ -->
+    <!-- ══ SURFACE MODE PANEL ════════════════════════════════════ -->
+    <div id="surface-panel">
+
+        <!-- Header card -->
+        <div class="surface-card">
+            <div id="sp-name">Planet</div>
+            <div id="sp-surface-type"></div>
+            <div id="sp-danger" style="margin-top:8px;"></div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="surface-card">
+            <div class="stat-grid">
+                <div class="stat-tile">
+                    <div class="stat-label">🌡 Temperature</div>
+                    <div class="stat-value" id="sp-temp">—</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">⬇ Gravity</div>
+                    <div class="stat-value" id="sp-gravity">—</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">🕐 Day Length</div>
+                    <div class="stat-value" id="sp-day">—</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">🌙 Moons</div>
+                    <div class="stat-value" id="sp-moons">—</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">🌌 Distance</div>
+                    <div class="stat-value" id="sp-dist">—</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">💨 Atmosphere</div>
+                    <div class="stat-value" id="sp-atm" style="font-size:12px;">—</div>
+                </div>
+            </div>
+            <div id="sp-gravity-tip" style="margin-top:10px;"></div>
+        </div>
+
+        <!-- Atmosphere composition -->
+        <div class="surface-card">
+            <div
+                style="font-family:'Orbitron',monospace;font-size:11px;color:rgba(80,200,255,0.8);letter-spacing:0.1em;margin-bottom:10px;">
+                ATMOSPHERE</div>
+            <div id="sp-atm-bars"></div>
+        </div>
+
+        <!-- Compass + sun direction -->
+        <div class="surface-card">
+            <div
+                style="font-family:'Orbitron',monospace;font-size:11px;color:rgba(80,200,255,0.8);letter-spacing:0.1em;margin-bottom:10px;">
+                SUN DIRECTION</div>
+            <div class="compass-wrap">
+                <div class="compass-ring">
+                    <span id="sp-compass-arrow">☀</span>
+                </div>
+                <div class="compass-label">Point toward the Sun<br><span style="opacity:0.55;font-size:11px;">arrow
+                        rotates as you look around</span></div>
+            </div>
+        </div>
+
+        <!-- Fun fact -->
+        <div class="surface-card">
+            <div
+                style="font-family:'Orbitron',monospace;font-size:11px;color:rgba(80,200,255,0.8);letter-spacing:0.1em;margin-bottom:8px;">
+                DID YOU KNOW?</div>
+            <div id="sp-fact" class="fact-box"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="surface-card hud-actions" style="flex-wrap:wrap;gap:10px;">
+            <button class="launch-btn" onclick="launchToSpace()">🚀 LAUNCH TO SPACE</button>
+        </div>
+    </div>
+
+    <!-- ══ SPACE CONTROLS LEGEND ═════════════════════════════════ -->
+    <div id="controls-legend">
+        <strong>CONTROLS</strong>
+        WASD / Arrows — Move<br>
+        Mouse — Look around<br>
+        Click planet — Travel there<br>
+        Q / E — Float up / down
+    </div>
+
+    <!-- ══ SURFACE CONTROLS LEGEND ═══════════════════════════════ -->
+    <div id="surface-controls-legend">
+        <strong>SURFACE MODE</strong>
+        WASD — Walk on planet<br>
+        Click rock — Pick up<br>
+        Click again — Throw it<br>
+        🚀 Launch — Return to space
+    </div>
+
+    <!-- ══ TRAVEL OVERLAY ════════════════════════════════════════ -->
     <div id="travel-overlay">
         <div class="warp-lines" style="left:48%"></div>
         <div class="warp-lines" style="left:50%;animation-delay:.1s"></div>
@@ -65,190 +152,185 @@
         <div class="travel-text">TRAVELLING THROUGH SPACE…</div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-     CONTROLS LEGEND
-══════════════════════════════════════════════════════════ -->
-    <div id="controls-legend">
-        <strong>CONTROLS</strong>
-        WASD / Arrow keys — Move<br>
-        Mouse — Look around<br>
-        Click — Travel / Pick up<br>
-        Q / E — Float up / down
+    <!-- ══ LAUNCH OVERLAY ════════════════════════════════════════ -->
+    <div id="launch-overlay">
+        <div class="launch-warp" style="left:48%"></div>
+        <div class="launch-warp" style="left:50%;animation-delay:.08s"></div>
+        <div class="launch-warp" style="left:52%;animation-delay:.16s"></div>
+        <div class="launch-warp" style="left:45%;animation-delay:.24s"></div>
+        <div class="launch-warp" style="left:55%;animation-delay:.04s"></div>
+        <div class="launch-text">🚀 LAUNCHING TO ORBIT…</div>
     </div>
 
-    <!-- ══════════════════════════════════════════════════════════
-     A-FRAME SCENE
-══════════════════════════════════════════════════════════ -->
-    <a-scene id="scene" renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true;"
+    <!-- ══ A-FRAME SCENE ════════════════════════════════════════ -->
+    <a-scene id="scene" renderer="antialias: true; colorManagement: true;"
         fog="type: exponential; color: #000010; density: 0.0012" background="color: #000005" vr-mode-ui="enabled: true"
         loading-screen="enabled: false">
+        <a-assets timeout="10000"></a-assets>
 
-        <!-- ── ASSETS ─────────────────────────────────────────────── -->
-        <a-assets timeout="10000">
-            <!-- We use procedural colours instead of textures for portability -->
-        </a-assets>
-
-        <!-- ══ STARFIELD ═════════════════════════════════════════════ -->
+        <!-- ── STARFIELD / ASTEROIDS ──────────────────────────────── -->
         <a-entity starfield="count: 4000"></a-entity>
-
-        <!-- ══ ASTEROID BELT ═════════════════════════════════════════ -->
         <a-entity asteroid-belt="innerRadius: 50; outerRadius: 60; count: 400"></a-entity>
 
-        <!-- ══ AMBIENT + POINT LIGHT ═════════════════════════════════ -->
+        <!-- ── LIGHTS ─────────────────────────────────────────────── -->
         <a-entity light="type: ambient; color: #111; intensity: 0.5"></a-entity>
         <a-entity light="type: point; color: #fff8e0; intensity: 3.5; distance: 500; decay: 1.2"
             position="0 0 0"></a-entity>
 
-        <!-- ══ SUN ════════════════════════════════════════════════════ -->
+        <!-- ══ SUN ════════════════════════════════════════════════ -->
         <a-entity id="sun" geometry="primitive: sphere; radius: 8; segmentsWidth: 64; segmentsHeight: 64"
             material="color: #ffcc00; emissive: #ff8800; emissiveIntensity: 1.2; shader: standard; roughness: 0.5; metalness: 0"
             position="0 0 0" sun-pulse self-rotate="speed: 0.3" class="clickable">
-            <!-- Corona glow -->
             <a-entity geometry="primitive: sphere; radius: 8.6"
                 material="color: #ff9900; opacity: 0.15; transparent: true; side: front; shader: flat"></a-entity>
             <a-entity geometry="primitive: sphere; radius: 9.4"
                 material="color: #ff6600; opacity: 0.06; transparent: true; side: front; shader: flat"></a-entity>
         </a-entity>
 
-        <!-- ══════════  P L A N E T S  ══════════════════════════════ -->
-
-        <!-- ── MERCURY ─────────────────────────────────────────────── -->
+        <!-- ══ MERCURY ════════════════════════════════════════════ -->
         <a-entity id="mercury-orbit" orbit="radius: 12; speed: 4.74; tilt: 7">
             <a-sphere id="mercury" radius="0.38" color="#9b9b9b" roughness="0.9" metalness="0.1" class="clickable"
                 travel-to="planet: mercury; radius: 0.38" self-rotate="speed: 0.1">
-                <!-- Surface rocks -->
-                <a-dodecahedron position="0.6 0.3 0" radius="0.06" color="#777" class="clickable"
+                <a-dodecahedron position="0.6 0.35 0" radius="0.06" color="#777" class="clickable"
                     pickup></a-dodecahedron>
-                <a-dodecahedron position="-0.5 0.3 0.2" radius="0.05" color="#888" class="clickable"
+                <a-dodecahedron position="-0.5 0.35 0.2" radius="0.05" color="#888" class="clickable"
+                    pickup></a-dodecahedron>
+                <a-dodecahedron position="0.2 0.4 -0.5" radius="0.04" color="#666" class="clickable"
                     pickup></a-dodecahedron>
             </a-sphere>
         </a-entity>
 
-        <!-- ── VENUS ──────────────────────────────────────────────── -->
+        <!-- ══ VENUS ══════════════════════════════════════════════ -->
         <a-entity id="venus-orbit" orbit="radius: 20; speed: 3.50; tilt: 3.4">
             <a-sphere id="venus" radius="0.95" color="#e8cda0" roughness="0.8" metalness="0" class="clickable"
                 travel-to="planet: venus; radius: 0.95" self-rotate="speed: -0.05">
-                <!-- Atmosphere -->
-                <a-sphere radius="1.02" color="#d4a060" opacity="0.18" transparent="true" shader="flat"></a-sphere>
-                <a-dodecahedron position="1.4 0.5 0" radius="0.1" color="#c09060" class="clickable"
+                <a-sphere radius="1.04" color="#d4a060" opacity="0.2" transparent="true" shader="flat"></a-sphere>
+                <!-- Volcanic rocks -->
+                <a-dodecahedron position="1.4 0.55 0" radius="0.11" color="#a0501a" class="clickable"
                     pickup></a-dodecahedron>
-                <a-dodecahedron position="-1 0.5 0.8" radius="0.08" color="#b08050" class="clickable"
+                <a-dodecahedron position="-0.9 0.55 0.8" radius="0.09" color="#904012" class="clickable"
                     pickup></a-dodecahedron>
+                <a-dodecahedron position="0.5 0.55 1.2" radius="0.08" color="#b06020" class="clickable"
+                    pickup></a-dodecahedron>
+                <!-- Lava crack visual -->
+                <a-torus radius="0.5" radius-tubular="0.02" color="#ff4400"
+                    material="emissive: #ff2200; emissiveIntensity: 0.5; opacity: 0.7; transparent: true"
+                    rotation="90 30 0"></a-torus>
             </a-sphere>
         </a-entity>
 
-        <!-- ── EARTH ──────────────────────────────────────────────── -->
+        <!-- ══ EARTH ══════════════════════════════════════════════ -->
         <a-entity id="earth-orbit" orbit="radius: 30; speed: 2.98; tilt: 23.4">
             <a-sphere id="earth" radius="1.0" color="#2255aa" roughness="0.7" metalness="0.1" class="clickable"
                 travel-to="planet: earth; radius: 1.0" self-rotate="speed: 1.0">
-                <!-- Land masses (overlay) -->
                 <a-sphere radius="1.001" color="#3a8a3a" opacity="0.55" transparent="true" shader="flat"></a-sphere>
-                <!-- Clouds -->
                 <a-sphere radius="1.06" color="#ffffff" opacity="0.12" transparent="true" shader="flat"
                     animation="property: rotation; to: 0 360 0; loop: true; dur: 120000; easing: linear"></a-sphere>
-                <!-- Atmosphere -->
                 <a-sphere radius="1.12" color="#4488ff" opacity="0.08" transparent="true" shader="flat"></a-sphere>
-
                 <!-- Moon -->
                 <a-entity orbit="radius: 2.8; speed: 1.02">
                     <a-sphere radius="0.27" color="#aaaaaa" roughness="1" metalness="0"
                         self-rotate="speed: 0.5"></a-sphere>
                 </a-entity>
-
-                <!-- Pick-up-able rock -->
+                <!-- Surface objects -->
                 <a-dodecahedron position="1.5 0.5 0" radius="0.12" color="#5a6a5a" class="clickable"
                     pickup></a-dodecahedron>
-                <a-dodecahedron position="-1.2 0.5 0.6" radius="0.1" color="#4a7a4a" class="clickable"
+                <a-dodecahedron position="-1.2 0.5 0.6" radius="0.10" color="#4a7a4a" class="clickable"
+                    pickup></a-dodecahedron>
+                <a-dodecahedron position="0.8 0.5 -1.2" radius="0.09" color="#4a6a5a" class="clickable"
                     pickup></a-dodecahedron>
             </a-sphere>
         </a-entity>
 
-        <!-- ── MARS ──────────────────────────────────────────────── -->
+        <!-- ══ MARS ═══════════════════════════════════════════════ -->
         <a-entity id="mars-orbit" orbit="radius: 42; speed: 2.41; tilt: 25.2">
             <a-sphere id="mars" radius="0.53" color="#c1440e" roughness="0.95" metalness="0" class="clickable"
                 travel-to="planet: mars; radius: 0.53" self-rotate="speed: 0.97">
                 <!-- Polar ice -->
-                <a-sphere radius="0.532" color="#ffffff" opacity="0.35" transparent="true" shader="flat"
-                    scale="0.2 1 0.2" position="0 0.52 0"></a-sphere>
-                <!-- Tiny moon Phobos -->
+                <a-sphere radius="0.535" color="#ffffff" opacity="0.4" transparent="true" shader="flat"
+                    scale="0.22 1 0.22" position="0 0.52 0"></a-sphere>
+                <!-- Phobos -->
                 <a-entity orbit="radius: 1.5; speed: 2.0">
                     <a-sphere radius="0.08" color="#999" roughness="1"></a-sphere>
                 </a-entity>
+                <!-- Red rocks -->
                 <a-dodecahedron position="0.8 0.4 0" radius="0.08" color="#8b3a12" class="clickable"
                     pickup></a-dodecahedron>
                 <a-dodecahedron position="-0.7 0.4 0.3" radius="0.07" color="#9c4520" class="clickable"
                     pickup></a-dodecahedron>
+                <a-dodecahedron position="0.3 0.4 0.7" radius="0.06" color="#7a3010" class="clickable"
+                    pickup></a-dodecahedron>
+                <!-- Visual: crater ring -->
+                <a-torus radius="0.32" radius-tubular="0.025" color="#7a3010"
+                    material="opacity: 0.55; transparent: true" rotation="90 20 0"></a-torus>
             </a-sphere>
         </a-entity>
 
-        <!-- ── JUPITER ────────────────────────────────────────────── -->
+        <!-- ══ JUPITER ════════════════════════════════════════════ -->
         <a-entity id="jupiter-orbit" orbit="radius: 65; speed: 1.31; tilt: 3.1">
             <a-sphere id="jupiter" radius="3.5" color="#c88b3a" roughness="0.6" metalness="0" class="clickable"
                 travel-to="planet: jupiter; radius: 3.5" self-rotate="speed: 2.4">
-                <!-- Bands -->
                 <a-sphere radius="3.51" color="#b06820" opacity="0.3" transparent="true" shader="flat" scale="1 0.15 1"
                     position="0 0.5 0"></a-sphere>
                 <a-sphere radius="3.51" color="#d4a060" opacity="0.2" transparent="true" shader="flat" scale="1 0.1 1"
                     position="0 -1 0"></a-sphere>
-                <!-- Great Red Spot -->
                 <a-sphere radius="3.52" color="#aa3010" opacity="0.6" transparent="true" shader="flat"
                     scale="0.6 0.25 0.6" position="1 0.5 3.2"></a-sphere>
-                <!-- Big moons -->
-                <a-entity orbit="radius: 5.5; speed: 1.5">
-                    <a-sphere radius="0.35" color="#ccc" roughness="0.8"></a-sphere>
-                </a-entity>
-                <a-entity orbit="radius: 7; speed: 0.9">
-                    <a-sphere radius="0.3" color="#b8a88a" roughness="0.8"></a-sphere>
-                </a-entity>
+                <a-entity orbit="radius: 5.5; speed: 1.5"><a-sphere radius="0.35" color="#ccc"
+                        roughness="0.8"></a-sphere></a-entity>
+                <a-entity orbit="radius: 7;   speed: 0.9"><a-sphere radius="0.3" color="#b8a88a"
+                        roughness="0.8"></a-sphere></a-entity>
                 <a-dodecahedron position="5 1 0" radius="0.3" color="#9a6a2a" class="clickable" pickup></a-dodecahedron>
+                <a-dodecahedron position="-5 1 0" radius="0.28" color="#8a5a20" class="clickable"
+                    pickup></a-dodecahedron>
             </a-sphere>
         </a-entity>
 
-        <!-- ── SATURN ─────────────────────────────────────────────── -->
+        <!-- ══ SATURN ═════════════════════════════════════════════ -->
         <a-entity id="saturn-orbit" orbit="radius: 95; speed: 0.97; tilt: 26.7">
             <a-sphere id="saturn" radius="2.9" color="#e0c56e" roughness="0.7" metalness="0" class="clickable"
                 travel-to="planet: saturn; radius: 2.9" self-rotate="speed: 2.2"
                 planet-ring="innerRadius: 4.2; outerRadius: 7.8; color: #c8a96e">
-                <!-- Bands -->
                 <a-sphere radius="2.91" color="#c8aa50" opacity="0.2" transparent="true" shader="flat" scale="1 0.12 1"
                     position="0 0.3 0"></a-sphere>
-                <!-- Moons -->
-                <a-entity orbit="radius: 9; speed: 0.7">
-                    <a-sphere radius="0.45" color="#e0d8c0" roughness="0.9"></a-sphere>
-                </a-entity>
+                <a-entity orbit="radius: 9; speed: 0.7"><a-sphere radius="0.45" color="#e0d8c0"
+                        roughness="0.9"></a-sphere></a-entity>
                 <a-dodecahedron position="4.5 1 0" radius="0.25" color="#b09050" class="clickable"
+                    pickup></a-dodecahedron>
+                <a-dodecahedron position="-4 1 0.5" radius="0.22" color="#c0a060" class="clickable"
                     pickup></a-dodecahedron>
             </a-sphere>
         </a-entity>
 
-        <!-- ── URANUS ─────────────────────────────────────────────── -->
+        <!-- ══ URANUS ═════════════════════════════════════════════ -->
         <a-entity id="uranus-orbit" orbit="radius: 125; speed: 0.68; tilt: 97.8">
             <a-sphere id="uranus" radius="2.0" color="#7de8e8" roughness="0.6" metalness="0.1" class="clickable"
                 travel-to="planet: uranus; radius: 2.0" self-rotate="speed: 1.4"
                 planet-ring="innerRadius: 2.8; outerRadius: 3.8; color: #6acecc">
-                <!-- Atmosphere tint -->
                 <a-sphere radius="2.08" color="#5dd5d5" opacity="0.1" transparent="true" shader="flat"></a-sphere>
-                <a-dodecahedron position="3 1 0" radius="0.2" color="#5ec0c0" class="clickable" pickup></a-dodecahedron>
-            </a-sphere>
-        </a-entity>
-
-        <!-- ── NEPTUNE ────────────────────────────────────────────── -->
-        <a-entity id="neptune-orbit" orbit="radius: 155; speed: 0.54; tilt: 28.3">
-            <a-sphere id="neptune" radius="1.9" color="#3f54ba" roughness="0.6" metalness="0.1" class="clickable"
-                travel-to="planet: neptune; radius: 1.9" self-rotate="speed: 1.5">
-                <!-- Storm bands -->
-                <a-sphere radius="1.91" color="#2040a0" opacity="0.25" transparent="true" shader="flat" scale="1 0.15 1"
-                    position="0 0.5 0"></a-sphere>
-                <!-- Triton moon -->
-                <a-entity orbit="radius: 3.5; speed: -0.5">
-                    <a-sphere radius="0.2" color="#bbcccc" roughness="0.9"></a-sphere>
-                </a-entity>
-                <a-dodecahedron position="2.8 1 0" radius="0.18" color="#304090" class="clickable"
+                <!-- Ice crystals -->
+                <a-dodecahedron position="3 1 0" radius="0.2" color="#aaffff" class="clickable" pickup></a-dodecahedron>
+                <a-dodecahedron position="-2.5 1 0.8" radius="0.18" color="#88eeff" class="clickable"
                     pickup></a-dodecahedron>
             </a-sphere>
         </a-entity>
 
-        <!-- ══ ORBIT RINGS (visual guides) ═══════════════════════════ -->
+        <!-- ══ NEPTUNE ════════════════════════════════════════════ -->
+        <a-entity id="neptune-orbit" orbit="radius: 155; speed: 0.54; tilt: 28.3">
+            <a-sphere id="neptune" radius="1.9" color="#3f54ba" roughness="0.6" metalness="0.1" class="clickable"
+                travel-to="planet: neptune; radius: 1.9" self-rotate="speed: 1.5">
+                <a-sphere radius="1.91" color="#2040a0" opacity="0.25" transparent="true" shader="flat" scale="1 0.15 1"
+                    position="0 0.5 0"></a-sphere>
+                <a-entity orbit="radius: 3.5; speed: -0.5"><a-sphere radius="0.2" color="#bbcccc"
+                        roughness="0.9"></a-sphere></a-entity>
+                <a-dodecahedron position="2.8 1 0" radius="0.18" color="#304090" class="clickable"
+                    pickup></a-dodecahedron>
+                <a-dodecahedron position="-2 1 1.2" radius="0.16" color="#405080" class="clickable"
+                    pickup></a-dodecahedron>
+            </a-sphere>
+        </a-entity>
+
+        <!-- ══ ORBIT GUIDE RINGS ══════════════════════════════════ -->
         <a-entity geometry="primitive: torus; radius: 12;  radiusTubular: 0.04; segmentsRadial: 128"
             material="color: #ffffff; opacity: 0.06; transparent: true; shader: flat" rotation="-90 0 0"></a-entity>
         <a-entity geometry="primitive: torus; radius: 20;  radiusTubular: 0.04; segmentsRadial: 128"
@@ -266,68 +348,79 @@
         <a-entity geometry="primitive: torus; radius: 155; radiusTubular: 0.06; segmentsRadial: 128"
             material="color: #ffffff; opacity: 0.04; transparent: true; shader: flat" rotation="-90 0 0"></a-entity>
 
-        <!-- ══ CAMERA RIG (with gravity controller) ═══════════════════ -->
+        <!-- ══ CAMERA RIG ═════════════════════════════════════════ -->
         <a-entity id="rig" position="0 20 60" movement-controls="fly: true; speed: 0.15; constrainToNavMesh: false"
             gravity-controller>
             <a-entity id="cam" camera="fov: 80; near: 0.1; far: 8000"
                 look-controls="pointerLockEnabled: true; reverseMouseDrag: false" position="0 1.6 0">
-                <!-- Cursor raycaster -->
                 <a-entity cursor="fuse: false; rayOrigin: mouse"
-                    raycaster="objects: .clickable; far: 600; interval: 50"></a-entity>
+                    raycaster="objects: .clickable; far: 600; interval: 50">
+                </a-entity>
             </a-entity>
-
-            <!-- Q = float up, E = float down helper hint (handled by movement-controls fly:true) -->
         </a-entity>
 
     </a-scene>
 
-    <!-- ══════════════════════════════════════════════════════════
-     SCRIPTS
-══════════════════════════════════════════════════════════ -->
+    <!-- ══ SCRIPTS ════════════════════════════════════════════════ -->
     <script src="solar-system.js"></script>
     <script>
-        // ── LOADING SCREEN ────────────────────────────────────────
+        // ── LOADING SCREEN ──────────────────────────────────────────
         const bar = document.getElementById('load-bar');
         const screen = document.getElementById('loading-screen');
         let progress = 0;
-        const interval = setInterval(() => {
+        const loadInterval = setInterval(() => {
             progress += Math.random() * 18;
-            if (progress >= 100) { progress = 100; clearInterval(interval); }
+            if (progress >= 100) { progress = 100; clearInterval(loadInterval); }
             bar.style.width = progress + '%';
         }, 120);
 
         document.querySelector('a-scene').addEventListener('loaded', () => {
-            clearInterval(interval);
+            clearInterval(loadInterval);
             bar.style.width = '100%';
             setTimeout(() => {
                 screen.style.opacity = '0';
-                setTimeout(() => screen.style.display = 'none', 800);
+                setTimeout(() => { screen.style.display = 'none'; }, 800);
             }, 600);
         });
 
-        // ── POINTER LOCK for better first-person control ───────────
+        // ── POINTER LOCK ────────────────────────────────────────────
         document.addEventListener('click', () => {
             const scene = document.getElementById('scene');
-            if (scene && !scene.is('vr-mode')) {
-                document.body.requestPointerLock?.();
-            }
+            if (scene && !scene.is('vr-mode')) document.body.requestPointerLock?.();
         });
 
-        // ── Q / E keys for manual up/down movement (supplement) ───
+        // ── Q / E VERTICAL FLOAT (space mode only) ──────────────────
         const rig = document.getElementById('rig');
         const keysDown = {};
-        document.addEventListener('keydown', e => { keysDown[e.key.toLowerCase()] = true; });
-        document.addEventListener('keyup', e => { keysDown[e.key.toLowerCase()] = false; });
+        document.addEventListener('keydown', e => { keysDown[e.code] = true; });
+        document.addEventListener('keyup', e => { keysDown[e.code] = false; });
 
         let lastT = 0;
         function floatTick(t) {
             const dt = (t - lastT) / 1000; lastT = t;
-            if (!rig) { requestAnimationFrame(floatTick); return; }
-            if (keysDown['q']) rig.object3D.position.y -= 8 * dt;
-            if (keysDown['e']) rig.object3D.position.y += 8 * dt;
+            if (!rig || surfaceState.onSurface) { requestAnimationFrame(floatTick); return; }
+            if (keysDown['KeyQ']) rig.object3D.position.y -= 8 * dt;
+            if (keysDown['KeyE']) rig.object3D.position.y += 8 * dt;
             requestAnimationFrame(floatTick);
         }
         requestAnimationFrame(floatTick);
+
+        // ── TOGGLE SURFACE vs SPACE CONTROLS LEGEND ─────────────────
+        const spaceLegend = document.getElementById('controls-legend');
+        const surfaceLegend = document.getElementById('surface-controls-legend');
+
+        // Watch for surface mode change
+        const legendObserver = new MutationObserver(() => {
+            const onSurface = surfaceState.onSurface;
+            spaceLegend.style.display = onSurface ? 'none' : 'block';
+            surfaceLegend.style.display = onSurface ? 'block' : 'none';
+        });
+        // Poll since surfaceState is a plain object
+        setInterval(() => {
+            const onSurface = surfaceState.onSurface;
+            spaceLegend.style.display = onSurface ? 'none' : 'block';
+            surfaceLegend.style.display = onSurface ? 'block' : 'none';
+        }, 300);
     </script>
 </body>
 

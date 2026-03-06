@@ -1,239 +1,540 @@
 /* =========================================================
-   SOLAR SYSTEM - HUD & Overlay Styles
+   SOLAR SYSTEM - Complete Styles (v2)
    ========================================================= */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600&display=swap');
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
 body {
-  overflow: hidden;
-  background: #000;
-  font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Rajdhani', sans-serif;
 }
 
-/* ── CROSSHAIR ── */
+/* ── CROSSHAIR ──────────────────────────────────────────────── */
 #crosshair {
-  position: fixed;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 24px; height: 24px;
-  pointer-events: none;
-  z-index: 100;
-  opacity: 0.5;
-  transition: opacity 0.2s;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.5;
+    transition: opacity 0.2s;
 }
-#crosshair::before, #crosshair::after {
-  content: '';
-  position: absolute;
-  background: rgba(100, 220, 255, 0.9);
-  border-radius: 2px;
-}
-#crosshair::before {
-  width: 2px; height: 100%;
-  left: 50%; transform: translateX(-50%);
-}
+
+#crosshair::before,
 #crosshair::after {
-  width: 100%; height: 2px;
-  top: 50%; transform: translateY(-50%);
+    content: '';
+    position: absolute;
+    background: rgba(100, 220, 255, 0.9);
+    border-radius: 2px;
 }
 
-/* ── TRAVEL HINT ── */
+#crosshair::before {
+    width: 2px;
+    height: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#crosshair::after {
+    width: 100%;
+    height: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* ── TRAVEL HINT ────────────────────────────────────────────── */
 #travel-hint {
-  position: fixed;
-  bottom: 80px; left: 50%;
-  transform: translateX(-50%);
-  display: none;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(100, 220, 255, 0.4);
-  color: #7df;
-  font-family: 'Orbitron', monospace;
-  font-size: 13px;
-  padding: 8px 20px;
-  border-radius: 20px;
-  letter-spacing: 0.08em;
-  pointer-events: none;
-  backdrop-filter: blur(8px);
-  z-index: 200;
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(100, 220, 255, 0.4);
+    color: #7df;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    padding: 8px 20px;
+    border-radius: 20px;
+    letter-spacing: 0.08em;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    z-index: 200;
 }
 
-/* ── HUD PLANET PANEL ── */
+/* ── BASIC HUD PANEL (sun / space) ─────────────────────────── */
 #hud-panel {
-  display: none;
-  position: fixed;
-  top: 24px; right: 24px;
-  flex-direction: column;
-  gap: 10px;
-  width: 320px;
-  z-index: 300;
-  animation: slideIn 0.4s ease;
+    display: none;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+    z-index: 300;
+    animation: slideIn 0.4s ease;
+}
+
+/* ── SURFACE MODE PANEL ─────────────────────────────────────── */
+#surface-panel {
+    --accent: #ffcc00;
+    display: none;
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    flex-direction: column;
+    gap: 10px;
+    width: 340px;
+    z-index: 300;
+    animation: slideIn 0.5s ease;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+#surface-panel::-webkit-scrollbar {
+    display: none;
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(40px); }
-  to   { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
+/* ── CARD BASE ──────────────────────────────────────────────── */
 .hud-card {
-  background: linear-gradient(135deg, rgba(0,20,40,0.92) 0%, rgba(0,40,70,0.85) 100%);
-  border: 1px solid rgba(80, 200, 255, 0.3);
-  border-radius: 16px;
-  padding: 20px 22px;
-  backdrop-filter: blur(16px);
-  box-shadow: 0 8px 40px rgba(0,150,255,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+    background: linear-gradient(135deg, rgba(0, 20, 40, 0.94) 0%, rgba(0, 40, 70, 0.88) 100%);
+    border: 1px solid rgba(80, 200, 255, 0.3);
+    border-radius: 16px;
+    padding: 18px 20px;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 8px 40px rgba(0, 150, 255, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-#hud-planet {
-  font-family: 'Orbitron', monospace;
-  font-size: 22px;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 20px rgba(80,200,255,0.8);
-  letter-spacing: 0.05em;
+/* surface card uses accent colour border */
+.surface-card {
+    background: linear-gradient(135deg, rgba(0, 15, 30, 0.96) 0%, rgba(0, 30, 55, 0.9) 100%);
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+    border-radius: 16px;
+    padding: 18px 20px;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 8px 40px color-mix(in srgb, var(--accent) 20%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-#hud-gravity {
-  font-size: 15px;
-  color: #7de8ff;
-  font-weight: 600;
-  margin-top: 2px;
+/* ── PLANET NAME HEADER ─────────────────────────────────────── */
+#hud-planet,
+#sp-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(80, 200, 255, 0.8);
+    letter-spacing: 0.05em;
 }
 
-#hud-fact {
-  font-size: 13px;
-  color: rgba(200, 230, 255, 0.8);
-  line-height: 1.5;
-  margin-top: 8px;
-  border-top: 1px solid rgba(80,200,255,0.15);
-  padding-top: 10px;
+#sp-name {
+    text-shadow: 0 0 20px color-mix(in srgb, var(--accent) 80%, transparent);
+    font-size: 24px;
 }
 
+/* ── SURFACE TYPE BADGE ─────────────────────────────────────── */
+#sp-surface-type {
+    display: inline-block;
+    margin-top: 5px;
+    background: color-mix(in srgb, var(--accent) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    color: var(--accent);
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.1em;
+}
+
+/* ── DANGER LINE ────────────────────────────────────────────── */
+#sp-danger {
+    font-size: 13px;
+    color: #ffaa44;
+    margin-top: 6px;
+    background: rgba(255, 100, 0, 0.12);
+    border-radius: 8px;
+    padding: 6px 10px;
+    border-left: 3px solid #ff6600;
+}
+
+/* ── STAT GRID ──────────────────────────────────────────────── */
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.stat-tile {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.stat-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: color-mix(in srgb, var(--accent) 80%, #aaa);
+    margin-bottom: 3px;
+    font-family: 'Orbitron', monospace;
+}
+
+.stat-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.2;
+}
+
+/* ── ATMOSPHERE BARS ─────────────────────────────────────────── */
+.atm-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.atm-label {
+    font-size: 11px;
+    color: rgba(200, 230, 255, 0.7);
+    width: 30px;
+    font-family: 'Orbitron', monospace;
+}
+
+.atm-bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.atm-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 80%, #0af), var(--accent));
+    border-radius: 3px;
+    transition: width 0.8s ease;
+}
+
+.atm-pct {
+    font-size: 11px;
+    color: rgba(200, 230, 255, 0.6);
+    width: 36px;
+    text-align: right;
+}
+
+/* ── GRAVITY TIP ─────────────────────────────────────────────── */
+#sp-gravity-tip {
+    font-size: 13px;
+    color: rgba(160, 220, 255, 0.85);
+    margin-top: 4px;
+    font-style: italic;
+    line-height: 1.4;
+}
+
+/* ── FACT BOX ────────────────────────────────────────────────── */
+.fact-box {
+    font-size: 13px;
+    color: rgba(200, 230, 255, 0.8);
+    line-height: 1.55;
+    border-top: 1px solid rgba(80, 200, 255, 0.12);
+    padding-top: 10px;
+    margin-top: 4px;
+}
+
+/* ── COMPASS ─────────────────────────────────────────────────── */
+.compass-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 2px;
+}
+
+.compass-ring {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid color-mix(in srgb, var(--accent) 50%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+}
+
+#sp-compass-arrow {
+    font-size: 20px;
+    display: block;
+    transition: transform 0.3s ease;
+    transform-origin: center;
+}
+
+.compass-label {
+    font-size: 12px;
+    color: rgba(160, 220, 255, 0.7);
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────────── */
 .hud-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .hud-btn {
-  flex: 1;
-  padding: 9px 14px;
-  border: 1px solid rgba(80,200,255,0.35);
-  border-radius: 10px;
-  background: rgba(0,80,140,0.4);
-  color: #7de8ff;
-  font-family: 'Orbitron', monospace;
-  font-size: 11px;
-  cursor: pointer;
-  letter-spacing: 0.06em;
-  transition: all 0.2s;
-  text-align: center;
+    flex: 1;
+    padding: 9px 14px;
+    border: 1px solid rgba(80, 200, 255, 0.35);
+    border-radius: 10px;
+    background: rgba(0, 80, 140, 0.4);
+    color: #7de8ff;
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.2s;
+    text-align: center;
 }
+
 .hud-btn:hover {
-  background: rgba(0,120,200,0.6);
-  border-color: rgba(80,200,255,0.7);
-  color: #fff;
-  box-shadow: 0 0 16px rgba(0,150,255,0.4);
+    background: rgba(0, 120, 200, 0.6);
+    border-color: rgba(80, 200, 255, 0.7);
+    color: #fff;
+    box-shadow: 0 0 16px rgba(0, 150, 255, 0.4);
 }
 
-/* ── TRAVEL OVERLAY ── */
-#travel-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(ellipse at center, rgba(0,80,160,0.3) 0%, rgba(0,0,0,0.95) 100%);
-  z-index: 500;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 16px;
-  transition: opacity 0.4s;
+.launch-btn {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    transition: all 0.25s;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+    background: color-mix(in srgb, var(--accent) 12%, rgba(0, 10, 20, 0.8));
+    color: var(--accent);
+    font-weight: 700;
 }
 
-.travel-text {
-  font-family: 'Orbitron', monospace;
-  font-size: 18px;
-  color: rgba(100,220,255,0.9);
-  letter-spacing: 0.2em;
-  animation: pulse 1.2s infinite;
+.launch-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, transparent 40%, color-mix(in srgb, var(--accent) 15%, transparent) 100%);
+}
+
+.launch-btn:hover {
+    background: color-mix(in srgb, var(--accent) 25%, rgba(0, 10, 20, 0.9));
+    box-shadow: 0 0 25px color-mix(in srgb, var(--accent) 40%, transparent), inset 0 0 10px color-mix(in srgb, var(--accent) 10%, transparent);
+    transform: translateY(-1px);
+}
+
+/* ── TRAVEL / LAUNCH OVERLAY ────────────────────────────────── */
+#travel-overlay,
+#launch-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0, 80, 160, 0.3) 0%, rgba(0, 0, 0, 0.95) 100%);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    transition: opacity 0.4s;
+}
+
+#launch-overlay {
+    background: radial-gradient(ellipse at center, rgba(80, 40, 0, 0.4) 0%, rgba(0, 0, 0, 0.97) 100%);
+}
+
+.travel-text,
+.launch-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    color: rgba(100, 220, 255, 0.9);
+    letter-spacing: 0.2em;
+    animation: pulseTxt 1.2s infinite;
+}
+
+.launch-text {
+    color: rgba(255, 180, 80, 0.9);
 }
 
 .warp-lines {
-  width: 2px; height: 120px;
-  background: linear-gradient(to bottom, transparent, #4af, transparent);
-  animation: warpLine 0.4s linear infinite;
-  position: absolute;
+    width: 2px;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, #4af, transparent);
+    animation: warpLine 0.4s linear infinite;
+    position: absolute;
+}
+
+.launch-warp {
+    width: 2px;
+    height: 160px;
+    background: linear-gradient(to top, transparent, rgba(255, 160, 60, 0.9), transparent);
+    animation: warpLine 0.3s linear infinite;
+    position: absolute;
 }
 
 @keyframes warpLine {
-  from { transform: translateY(-60px) scaleY(1); opacity: 0.8; }
-  to   { transform: translateY(60px)  scaleY(2); opacity: 0; }
+    from {
+        transform: translateY(-80px) scaleY(1);
+        opacity: 0.8;
+    }
+
+    to {
+        transform: translateY(80px) scaleY(2.5);
+        opacity: 0;
+    }
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.6; }
-  50%       { opacity: 1; }
+@keyframes pulseTxt {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
-/* ── LOADING SCREEN ── */
+/* ── LANDING FLASH ──────────────────────────────────────────── */
+#landing-flash {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.35);
+    z-index: 600;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.8s;
+}
+
+/* ── LOADING SCREEN ─────────────────────────────────────────── */
 #loading-screen {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 18px;
-  transition: opacity 0.8s;
-}
-#loading-screen h1 {
-  font-family: 'Orbitron', monospace;
-  font-size: 32px;
-  color: #fff;
-  letter-spacing: 0.1em;
-  text-shadow: 0 0 30px rgba(100,200,255,0.6);
-}
-#loading-screen p {
-  color: rgba(120,200,255,0.7);
-  font-size: 14px;
-  letter-spacing: 0.15em;
-}
-.loading-bar-wrap {
-  width: 200px;
-  height: 3px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.loading-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #0af, #07f);
-  border-radius: 3px;
-  transition: width 0.3s linear;
-  box-shadow: 0 0 10px #0af;
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    transition: opacity 0.8s;
 }
 
-/* ── CONTROLS LEGEND ── */
-#controls-legend {
-  position: fixed;
-  bottom: 24px; left: 24px;
-  background: rgba(0,15,30,0.7);
-  border: 1px solid rgba(80,200,255,0.15);
-  border-radius: 12px;
-  padding: 14px 18px;
-  color: rgba(160,220,255,0.7);
-  font-size: 12px;
-  line-height: 1.8;
-  letter-spacing: 0.04em;
-  backdrop-filter: blur(8px);
-  z-index: 200;
+#loading-screen h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 32px;
+    color: #fff;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 30px rgba(100, 200, 255, 0.6);
 }
+
+#loading-screen p {
+    color: rgba(120, 200, 255, 0.7);
+    font-size: 14px;
+    letter-spacing: 0.15em;
+}
+
+.loading-bar-wrap {
+    width: 200px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.loading-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #0af, #07f);
+    border-radius: 3px;
+    transition: width 0.3s linear;
+    box-shadow: 0 0 10px #0af;
+}
+
+/* ── CONTROLS LEGEND ─────────────────────────────────────────── */
+#controls-legend {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: rgba(0, 15, 30, 0.7);
+    border: 1px solid rgba(80, 200, 255, 0.15);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: rgba(160, 220, 255, 0.7);
+    font-size: 12px;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    z-index: 200;
+}
+
 #controls-legend strong {
-  display: block;
-  font-family: 'Orbitron', monospace;
-  font-size: 10px;
-  color: rgba(80,200,255,0.9);
-  margin-bottom: 4px;
-  letter-spacing: 0.1em;
+    display: block;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: rgba(80, 200, 255, 0.9);
+    margin-bottom: 4px;
+    letter-spacing: 0.1em;
+}
+
+/* ── SURFACE MODE CONTROLS ──────────────────────────────────── */
+#surface-controls-legend {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: rgba(0, 15, 30, 0.7);
+    border: 1px solid rgba(80, 200, 255, 0.15);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: rgba(160, 220, 255, 0.7);
+    font-size: 12px;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    backdrop-filter: blur(8px);
+    z-index: 200;
+}
+
+#surface-controls-legend strong {
+    display: block;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    color: rgba(80, 200, 255, 0.9);
+    margin-bottom: 4px;
+    letter-spacing: 0.1em;
 }
